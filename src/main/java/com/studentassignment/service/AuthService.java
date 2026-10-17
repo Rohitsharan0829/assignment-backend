@@ -1,0 +1,9 @@
+package com.studentassignment.service;
+import com.studentassignment.api.AuthDtos.*; import com.studentassignment.model.User; import com.studentassignment.repository.UserRepository; import com.studentassignment.security.JwtService; import org.springframework.http.HttpStatus; import org.springframework.security.authentication.*; import org.springframework.security.core.AuthenticationException; import org.springframework.security.crypto.password.PasswordEncoder; import org.springframework.stereotype.Service; import org.springframework.transaction.annotation.Transactional;
+@Service public class AuthService {
+ private final UserRepository users; private final PasswordEncoder encoder; private final AuthenticationManager authentication; private final JwtService jwt;
+ public AuthService(UserRepository users,PasswordEncoder encoder,AuthenticationManager authentication,JwtService jwt){this.users=users;this.encoder=encoder;this.authentication=authentication;this.jwt=jwt;}
+ @Transactional public AuthResponse register(RegisterRequest r){String email=r.email().trim().toLowerCase();if(users.existsByEmailIgnoreCase(email))throw new ApiException(HttpStatus.CONFLICT,"An account with this email already exists.");User u=users.save(new User(r.fullName().trim(),email,encoder.encode(r.password()),r.role(),r.department()==null?null:r.department().trim()));return response(u);}
+ public AuthResponse login(LoginRequest r){try{authentication.authenticate(new UsernamePasswordAuthenticationToken(r.email().trim().toLowerCase(),r.password()));}catch(AuthenticationException e){throw new ApiException(HttpStatus.UNAUTHORIZED,"Invalid email or password.");}return response(users.findByEmailIgnoreCase(r.email().trim()).orElseThrow(()->new ApiException(HttpStatus.UNAUTHORIZED,"Invalid email or password.")));}
+ private AuthResponse response(User u){return new AuthResponse(jwt.issue(u.getEmail(),u.getRole().name()),u.getId(),u.getEmail(),u.getFullName(),u.getRole().name());}
+}

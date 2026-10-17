@@ -1,0 +1,3 @@
+package com.studentassignment.repository;
+import com.studentassignment.model.Submission; import java.util.List; import java.util.Optional; import org.springframework.data.jpa.repository.JpaRepository;
+public interface SubmissionRepository extends JpaRepository<Submission,Long> { List<Submission> findByStudentIdOrderBySubmittedAtDesc(Long studentId); List<Submission> findByAssignmentIdOrderBySubmittedAtDesc(Long assignmentId); Optional<Submission> findByAssignmentIdAndStudentId(Long assignmentId,Long studentId); long countByStudentId(Long studentId); long countByStudentIdAndStatus(Long studentId,com.studentassignment.model.SubmissionStatus status); }

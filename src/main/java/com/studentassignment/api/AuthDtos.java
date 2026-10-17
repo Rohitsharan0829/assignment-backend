@@ -1,0 +1,3 @@
+package com.studentassignment.api;
+import com.studentassignment.model.UserRole; import jakarta.validation.constraints.*;
+public final class AuthDtos {private AuthDtos(){} public record RegisterRequest(@NotBlank @Size(max=100) String fullName,@NotBlank @Email @Size(max=150) String email,@NotBlank @Size(min=6,max=72) String password,@NotNull UserRole role,@Size(max=100) String department){} public record LoginRequest(@NotBlank @Email String email,@NotBlank String password){} public record AuthResponse(String token,Long userId,String email,String fullName,String role){} public record GradeRequest(@NotNull @Min(0) Integer marks,String feedback){} }
